@@ -1,0 +1,101 @@
+# Requirements pour le Chatbot Touristique Tunis
+
+## requirements.txt
+
+numpy>=1.21.0
+scikit-learn>=1.0.0
+nltk>=3.6
+sentence-transformers>=2.2.0
+
+## Installation
+
+### Étape 1: Créer un environnement virtuel (recommandé)
+
+```bash
+# Sur Windows
+python -m venv venv
+venv\Scripts\activate
+
+# Sur Mac/Linux
+python3 -m venv venv
+source venv/bin/activate
+```
+
+### Étape 2: Installer les dépendances
+
+```bash
+pip install -r requirements.txt
+```
+
+### Étape 3: Télécharger les ressources NLTK
+Le script le fait automatiquement au premier lancement, mais vous pouvez aussi:
+
+```python
+import nltk
+nltk.download('punkt')
+nltk.download('stopwords')
+```
+
+### Étape 4: Lancer le chatbot
+
+#### Version Console:
+```bash
+python tunis_chatbot.py
+```
+
+#### Version Web:
+1. Ouvrir le fichier `tunis_chatbot_web.html` dans votre navigateur
+2. Ou utiliser un serveur local:
+```bash
+python -m http.server 8000
+```
+Puis ouvrir: http://localhost:8000/tunis_chatbot_web.html
+
+## Structure des fichiers
+
+```
+projet-chatbot-tunis/
+│
+├── tunis_chatbot.py              # Code principal du chatbot
+├── tunis_chatbot_web.html        # Interface web
+├── requirements.txt              # Dépendances Python
+├── README.md                     # Documentation
+└── presentation/
+    ├── slides.pdf                # Présentation PowerPoint
+    └── rapport.pdf               # Rapport (optionnel)
+```
+
+## Exemples de questions à tester
+
+1. "Bonjour"
+2. "Quels sont les lieux touristiques à Tunis?"
+3. "Où manger à Tunis?"
+4. "Comment visiter Carthage?"
+5. "Que faire en une journée?"
+6. "Comment se déplacer?"
+7. "Quelle est la meilleure période pour visiter?"
+8. "Que voir dans la Médina?"
+9. "Au revoir"
+
+## Techniques utilisées
+
+✅ **Approche par règles**: Pattern matching pour salutations, aide, etc.
+✅ **TF-IDF**: Vectorisation et similarité cosinus
+✅ **Embeddings**: Sentence-BERT (multilingue)
+✅ **Approche hybride**: Combinaison intelligente des 3 méthodes
+
+## Dépannage
+
+### Problème: sentence-transformers ne s'installe pas
+Solution: Le chatbot fonctionne sans embeddings, utilisant uniquement règles + TF-IDF
+
+### Problème: Erreur NLTK
+Solution: Exécuter manuellement:
+```python
+import nltk
+nltk.download('punkt')
+nltk.download('stopwords')
+```
+
+### Problème: Encodage des caractères
+Solution: S'assurer que les fichiers sont en UTF-8

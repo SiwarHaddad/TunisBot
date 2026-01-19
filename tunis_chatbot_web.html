@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TunisBot - Guide Touristique Intelligent</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .chat-container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 90vh;
+            max-height: 700px;
+        }
+        
+        .chat-header {
+            background: linear-gradient(135deg, #e01e37 0%, #c41230 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .chat-header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .chat-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f5f5f5;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message.bot {
+            justify-content: flex-start;
+        }
+        
+        .message.user {
+            justify-content: flex-end;
+        }
+        
+        .message-bubble {
+            max-width: 70%;
+            padding: 12px 18px;
+            border-radius: 18px;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            line-height: 1.5;
+        }
+        
+        .message.bot .message-bubble {
+            background: white;
+            color: #333;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .message.user .message-bubble {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .message-info {
+            font-size: 11px;
+            opacity: 0.6;
+            margin-top: 5px;
+            text-align: right;
+        }
+        
+        .chat-input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 12px 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        .chat-input:focus {
+            border-color: #667eea;
+        }
+        
+        .send-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            font-weight: 600;
+        }
+        
+        .send-button:hover {
+            transform: scale(1.05);
+        }
+        
+        .send-button:active {
+            transform: scale(0.95);
+        }
+        
+        .quick-questions {
+            padding: 15px 20px;
+            background: #f9f9f9;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .quick-btn {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .quick-btn:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .typing-indicator {
+            display: none;
+            padding: 10px 18px;
+            background: white;
+            border-radius: 18px;
+            border-bottom-left-radius: 4px;
+            max-width: 70px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .typing-indicator.active {
+            display: inline-block;
+        }
+        
+        .typing-indicator span {
+            height: 8px;
+            width: 8px;
+            background: #667eea;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 2px;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>🏛️ TunisBot 🇹🇳</h1>
+            <p>Votre guide touristique intelligent pour Tunis</p>
+        </div>
+        
+        <div class="quick-questions">
+            <button class="quick-btn" onclick="sendQuickQuestion('Quels sont les lieux touristiques?')">📍 Lieux touristiques</button>
+            <button class="quick-btn" onclick="sendQuickQuestion('Où manger à Tunis?')">🍽️ Restaurants</button>
+            <button class="quick-btn" onclick="sendQuickQuestion('Comment se déplacer?')">🚇 Transports</button>
+            <button class="quick-btn" onclick="sendQuickQuestion('Visite d\'une journée')">📅 Itinéraire</button>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <!-- Messages apparaîtront ici -->
+        </div>
+        
+        <div class="chat-input-container">
+            <input 
+                type="text" 
+                class="chat-input" 
+                id="userInput" 
+                placeholder="Posez votre question sur Tunis..."
+                onkeypress="handleKeyPress(event)"
+            >
+            <button class="send-button" onclick="sendMessage()">Envoyer</button>
+        </div>
+    </div>
+
+    <script>
+        // Base de connaissances (même structure que le chatbot Python)
+        const knowledgeBase = [
+            {
+                question: "Quels sont les principaux lieux touristiques à Tunis?",
+                answer: "Les principaux lieux touristiques à Tunis incluent:\n- La Médina de Tunis (classée UNESCO)\n- Le site archéologique de Carthage\n- Le village de Sidi Bou Saïd\n- Le Musée National du Bardo\n- La Mosquée Zitouna\n- L'Avenue Habib Bourguiba",
+                keywords: ["lieux", "touristiques", "visiter", "voir", "attractions"]
+            },
+            {
+                question: "Que voir dans la Médina de Tunis?",
+                answer: "Dans la Médina de Tunis, vous pouvez visiter:\n- La Mosquée Zitouna (la plus grande mosquée de Tunis)\n- Les souks traditionnels (parfums, tissus, bijoux)\n- Dar Lasram et autres palais ottomans\n- Les médersas historiques\n- Les portes anciennes (Bab El Bhar, Bab Souika)\nC'est un labyrinthe fascinant de ruelles étroites!",
+                keywords: ["médina", "souks", "zitouna", "mosquée"]
+            },
+            {
+                question: "Comment visiter Carthage?",
+                answer: "Pour visiter Carthage:\n- Prenez le TGM (train) depuis Tunis Marine jusqu'à Carthage Hannibal\n- Achetez un billet global pour tous les sites (environ 12 DT)\n- Sites principaux: Thermes d'Antonin, Théâtre romain, Tophet, Musée de Carthage\n- Comptez une demi-journée à une journée complète\n- Combinez avec Sidi Bou Saïd tout proche!",
+                keywords: ["carthage", "ruines", "thermes", "tgm"]
+            },
+            {
+                question: "Pourquoi visiter Sidi Bou Saïd?",
+                answer: "Sidi Bou Saïd est célèbre pour:\n- Ses maisons blanches et bleues iconiques\n- Ses ruelles pavées pittoresques\n- La vue panoramique sur la Méditerranée\n- Le Café des Nattes (thé à la menthe et pignons)\n- Les galeries d'art et boutiques d'artisanat\n- L'ambiance bohème et artistique\nC'est l'un des plus beaux villages de Tunisie!",
+                keywords: ["sidi bou said", "bleu", "blanc", "café", "nattes"]
+            },
+            {
+                question: "Où manger à Tunis?",
+                answer: "Bonnes adresses à Tunis:\n- Dar El Jeld (cuisine traditionnelle raffinée, Médina)\n- Le Baroque (cuisine fusion, La Marsa)\n- Chez Slah (poissons, La Goulette)\n- La Closerie (française, Lac de Tunis)\n- M'rabet (pâtisseries, Avenue Habib Bourguiba)\n- Essaraya (traditionnel, Gammarth)",
+                keywords: ["manger", "restaurant", "dîner", "déjeuner", "cuisine"]
+            },
+            {
+                question: "Quelles spécialités tunisiennes goûter?",
+                answer: "Spécialités incontournables:\n- Couscous (vendredi tradition)\n- Brik à l'œuf (feuille croustillante)\n- Tajine tunisien (différent du marocain)\n- Ojja (plat aux œufs épicé)\n- Lablabi (soupe de pois chiches)\n- Mechouia (salade grillée)\n- Makroudh et baklawa (pâtisseries)\n- Thé à la menthe et pignons",
+                keywords: ["spécialités", "plats", "couscous", "brik", "gastronomie"]
+            },
+            {
+                question: "Comment se déplacer à Tunis?",
+                answer: "Moyens de transport à Tunis:\n- Métro léger (5 lignes, bon marché)\n- TGM: train de banlieue vers La Marsa/Carthage\n- Bus: réseau étendu mais souvent bondé\n- Taxis: jaunes (compteur) ou louages blancs (collectifs)\n- Uber et Bolt: disponibles\n- Location de voiture: pour plus de liberté\nLe métro est le plus pratique pour le centre-ville.",
+                keywords: ["transport", "déplacer", "métro", "bus", "taxi"]
+            },
+            {
+                question: "Que faire en une journée à Tunis?",
+                answer: "Itinéraire d'une journée:\nMatin:\n- Médina de Tunis et Mosquée Zitouna (2h)\n- Souks et shopping artisanal (1h)\nMidi:\n- Déjeuner dans la Médina\nAprès-midi:\n- Musée du Bardo (2h)\n- Avenue Habib Bourguiba (balade)\nSoir:\n- Dîner à Sidi Bou Saïd + coucher de soleil\nAlternative: remplacer Bardo par Carthage",
+                keywords: ["journée", "itinéraire", "programme", "jour"]
+            },
+            {
+                question: "Quelle est la meilleure période pour visiter Tunis?",
+                answer: "Meilleures périodes pour visiter Tunis:\n- Printemps (mars-mai): temps doux, 18-25°C, idéal\n- Automne (septembre-novembre): agréable, moins de touristes\n- Été (juin-août): chaud (30-35°C), animation, plages\n- Hiver (décembre-février): doux mais pluvieux\nÉvitez juillet-août si vous n'aimez pas la chaleur intense.",
+                keywords: ["période", "quand", "météo", "climat", "saison"]
+            }
+        ];
+
+        // Variables globales
+        let conversationHistory = [];
+        
+        // Initialisation
+        window.onload = function() {
+            addBotMessage("Bonjour! Je suis votre guide touristique virtuel pour Tunis. Comment puis-je vous aider à découvrir notre belle ville? 🌟", "rule-based");
+        };
+        
+        // Fonction pour ajouter un message au chat
+        function addMessage(text, sender, method = null) {
+            const messagesDiv = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const bubbleDiv = document.createElement('div');
+            bubbleDiv.className = 'message-bubble';
+            bubbleDiv.textContent = text;
+            
+            messageDiv.appendChild(bubbleDiv);
+            
+            if (sender === 'bot' && method) {
+                const infoDiv = document.createElement('div');
+                infoDiv.className = 'message-info';
+                infoDiv.textContent = `[${method}]`;
+                bubbleDiv.appendChild(infoDiv);
+            }
+            
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+        
+        function addBotMessage(text, method) {
+            addMessage(text, 'bot', method);
+        }
+        
+        function addUserMessage(text) {
+            addMessage(text, 'user');
+        }
+        
+        // Pattern matching simple
+        function ruleBasedResponse(input) {
+            const lower = input.toLowerCase();
+            
+            if (/\b(bonjour|salut|hey|hello|bonsoir)\b/.test(lower)) {
+                return "Bonjour! Je suis votre guide touristique virtuel pour Tunis. Comment puis-je vous aider à découvrir notre belle ville? 🌟";
+            }
+            if (/\b(au revoir|bye|à bientôt|merci|adieu)\b/.test(lower)) {
+                return "Au revoir! J'espère que vous passerez un merveilleux séjour à Tunis. Bon voyage! 🌟";
+            }
+            if (/\b(aide|aider|comment|commencer|que faire)\b/.test(lower)) {
+                return "Je peux vous aider avec:\n- Les lieux touristiques (Médina, Carthage, Sidi Bou Saïd...)\n- Les restaurants et spécialités culinaires\n- Les transports et infos pratiques\n- L'histoire et la culture\n- Des itinéraires suggérés\n\nPosez-moi une question!";
+            }
+            if (/\b(qui es-tu|ton nom|tu es qui|c'est quoi ton nom)\b/.test(lower)) {
+                return "Je suis TunisBot, votre assistant touristique intelligent pour découvrir Tunis et ses merveilles! 🇹🇳";
+            }
+            
+            return null;
+        }
+        
+        // Recherche par mots-clés (simulation de TF-IDF simplifié)
+        function keywordMatching(input) {
+            const lower = input.toLowerCase();
+            let bestMatch = null;
+            let bestScore = 0;
+            
+            knowledgeBase.forEach(item => {
+                let score = 0;
+                item.keywords.forEach(keyword => {
+                    if (lower.includes(keyword)) {
+                        score += 2;
+                    }
+                });
+                
+                // Bonus si le mot est dans la question
+                const questionWords = item.question.toLowerCase().split(' ');
+                questionWords.forEach(word => {
+                    if (word.length > 3 && lower.includes(word)) {
+                        score += 1;
+                    }
+                });
+                
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestMatch = item;
+                }
+            });
+            
+            if (bestScore >= 2) {
+                return bestMatch.answer;
+            }
+            
+            return null;
+        }
+        
+        // Réponse par défaut
+        function fallbackResponse() {
+            return "Je ne suis pas sûr de bien comprendre votre question. Pourriez-vous la reformuler? Je peux vous renseigner sur:\n- Les sites touristiques (Médina, Carthage, Sidi Bou Saïd)\n- Les restaurants et la gastronomie tunisienne\n- Les transports et informations pratiques\n- L'histoire et la culture\n- Des suggestions d'itinéraires";
+        }
+        
+        // Fonction principale de traitement
+        function processMessage(userInput) {
+            // 1. Règles
+            let response = ruleBasedResponse(userInput);
+            if (response) {
+                return { text: response, method: 'rule-based' };
+            }
+            
+            // 2. Recherche par mots-clés (simulation TF-IDF)
+            response = keywordMatching(userInput);
+            if (response) {
+                return { text: response, method: 'keyword-matching' };
+            }
+            
+            // 3. Fallback
+            return { text: fallbackResponse(), method: 'fallback' };
+        }
+        
+        // Envoyer un message
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const userInput = input.value.trim();
+            
+            if (!userInput) return;
+            
+            // Afficher le message utilisateur
+            addUserMessage(userInput);
+            input.value = '';
+            
+            // Simuler un délai de réflexion
+            setTimeout(() => {
+                const result = processMessage(userInput);
+                addBotMessage(result.text, result.method);
+            }, 500);
+        }
+        
+        // Envoyer une question rapide
+        function sendQuickQuestion(question) {
+            document.getElementById('userInput').value = question;
+            sendMessage();
+        }
+        
+        // Gérer la touche Entrée
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+    </script>
+</body>
+</html>

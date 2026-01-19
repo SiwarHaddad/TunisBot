@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TunisBot - Guide Touristique Intelligent</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .chat-container {
+            width: 100%;
+            max-width: 900px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 90vh;
+            max-height: 750px;
+        }
+        
+        .chat-header {
+            background: linear-gradient(135deg, #e01e37 0%, #c41230 100%);
+            color: white;
+            padding: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-left h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .header-left p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .header-right {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .header-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+        
+        .header-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .stats-panel {
+            background: rgba(255,255,255,0.1);
+            padding: 10px 20px;
+            font-size: 12px;
+            display: flex;
+            justify-content: space-around;
+            color: white;
+        }
+        
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f5f5f5;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message.bot {
+            justify-content: flex-start;
+        }
+        
+        .message.user {
+            justify-content: flex-end;
+        }
+        
+        .message-bubble {
+            max-width: 70%;
+            padding: 12px 18px;
+            border-radius: 18px;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            line-height: 1.5;
+            position: relative;
+        }
+        
+        .message.bot .message-bubble {
+            background: white;
+            color: #333;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .message.user .message-bubble {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .message-badge {
+            position: absolute;
+            bottom: -8px;
+            right: 10px;
+            font-size: 9px;
+            background: #667eea;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        
+        .quick-questions {
+            padding: 15px 20px;
+            background: #f9f9f9;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .quick-btn {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .quick-btn:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+        
+        .chat-input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 12px 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        .chat-input:focus {
+            border-color: #667eea;
+        }
+        
+        .send-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            font-weight: 600;
+        }
+        
+        .send-button:hover {
+            transform: scale(1.05);
+        }
+        
+        .send-button:active {
+            transform: scale(0.95);
+        }
+        
+        .send-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .typing-indicator {
+            display: none;
+            padding: 10px 18px;
+            background: white;
+            border-radius: 18px;
+            border-bottom-left-radius: 4px;
+            max-width: 70px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .typing-indicator.active {
+            display: inline-block;
+        }
+        
+        .typing-indicator span {
+            height: 8px;
+            width: 8px;
+            background: #667eea;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 2px;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        .error-message {
+            background: #ff4444;
+            color: white;
+            padding: 10px 20px;
+            margin: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="header-left">
+                <h1>🏛️ TunisBot 🇹🇳</h1>
+                <p><strong>Votre guide touristique intelligent - Approche Hybride (IA)</strong></p>
+            </div>
+            <div class="header-right">
+                <button class="header-btn" onclick="showStats()">📊 <strong>Stats</strong></button>
+                <button class="header-btn" onclick="resetChat()">🔄 <strong>Reset</strong></button>
+            </div>
+        </div>
+        
+        <div class="stats-panel">
+            <div class="stat-item">
+                <span>💬</span>
+                <span id="messageCount">0 messages</span>
+            </div>
+            <div class="stat-item">
+                <span>🤖</span>
+                <span>Règles + TF-IDF + Embeddings</span>
+            </div>
+            <div class="stat-item">
+                <span>🌐</span>
+                <span id="connectionStatus"><strong>Connecté</strong></span>
+            </div>
+        </div>
+        
+        <div class="quick-questions">
+            <button class="quick-btn" onclick="sendQuickQuestion('Quels sont les lieux touristiques?')">📍 <strong>Lieux touristiques</strong></button>
+            <button class="quick-btn" onclick="sendQuickQuestion('Où manger à Tunis?')">🍽️ <strong>Restaurants</strong></button>
+            <button class="quick-btn" onclick="sendQuickQuestion('Comment se déplacer?')">🚇 <strong>Transports</strong></button>
+            <button class="quick-btn" onclick="sendQuickQuestion('Visite d\'une journée')">📅 <strong>Itinéraire</strong></button>
+            <button class="quick-btn" onclick="sendQuickQuestion('Spécialités tunisiennes')">🥘 <strong>Gastronomie</strong></button>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot">
+                <div class="message-bubble">
+                    Bonjour! Je suis votre guide touristique virtuel pour Tunis. Comment puis-je vous aider à découvrir notre belle ville? 🌟
+                    <div class="message-badge">RULE-BASED</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chat-input-container">
+            <input 
+                type="text" 
+                class="chat-input" 
+                id="userInput" 
+                placeholder="Posez votre question sur Tunis..."
+                onkeypress="handleKeyPress(event)"
+            >
+            <button class="send-button" id="sendButton" onclick="sendMessage()">Envoyer</button>
+        </div>
+    </div>
+
+    <script>
+        // Configuration de l'API
+        const API_URL = 'http://localhost:5000/api';
+        let messageCount = 0;
+        
+        // Fonction pour ajouter un message au chat
+        function addMessage(text, sender, method = null) {
+            const messagesDiv = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const bubbleDiv = document.createElement('div');
+            bubbleDiv.className = 'message-bubble';
+            bubbleDiv.textContent = text;
+            
+            if (sender === 'bot' && method) {
+                const badgeDiv = document.createElement('div');
+                badgeDiv.className = 'message-badge';
+                badgeDiv.textContent = method.toUpperCase();
+                bubbleDiv.appendChild(badgeDiv);
+            }
+            
+            messageDiv.appendChild(bubbleDiv);
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            
+            messageCount++;
+            updateMessageCount();
+        }
+        
+        function addBotMessage(text, method) {
+            addMessage(text, 'bot', method);
+        }
+        
+        function addUserMessage(text) {
+            addMessage(text, 'user');
+        }
+        
+        function showTypingIndicator() {
+            const messagesDiv = document.getElementById('chatMessages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot';
+            typingDiv.id = 'typingIndicator';
+            typingDiv.innerHTML = `
+                <div class="typing-indicator active">
+                    <span></span><span></span><span></span>
+                </div>
+            `;
+            messagesDiv.appendChild(typingDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+        
+        function hideTypingIndicator() {
+            const indicator = document.getElementById('typingIndicator');
+            if (indicator) {
+                indicator.remove();
+            }
+        }
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.classList.add('show');
+            setTimeout(() => {
+                errorDiv.classList.remove('show');
+            }, 3000);
+        }
+        
+        function updateMessageCount() {
+            document.getElementById('messageCount').textContent = `${messageCount} messages`;
+        }
+        
+        function updateConnectionStatus(connected) {
+            const status = document.getElementById('connectionStatus');
+            status.textContent = connected ? 'Connecté' : 'Déconnecté';
+            status.style.color = connected ? '#4CAF50' : '#ff4444';
+        }
+        
+        // Envoyer un message
+        async function sendMessage() {
+            const input = document.getElementById('userInput');
+            const sendButton = document.getElementById('sendButton');
+            const userInput = input.value.trim();
+            
+            if (!userInput) return;
+            
+            // Afficher le message utilisateur
+            addUserMessage(userInput);
+            input.value = '';
+            
+            // Désactiver le bouton pendant l'envoi
+            sendButton.disabled = true;
+            showTypingIndicator();
+            
+            try {
+                // Envoyer la requête à l'API
+                const response = await fetch(`${API_URL}/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: userInput })
+                });
+                
+                const data = await response.json();
+                
+                hideTypingIndicator();
+                
+                if (data.success) {
+                    addBotMessage(data.response, data.method);
+                    updateConnectionStatus(true);
+                } else {
+                    showError('Erreur: ' + data.error);
+                    updateConnectionStatus(false);
+                }
+            } catch (error) {
+                hideTypingIndicator();
+                showError('Erreur de connexion au serveur. Assurez-vous que le serveur Flask est démarré.');
+                updateConnectionStatus(false);
+                console.error('Erreur:', error);
+            } finally {
+                sendButton.disabled = false;
+                input.focus();
+            }
+        }
+        
+        // Envoyer une question rapide
+        function sendQuickQuestion(question) {
+            document.getElementById('userInput').value = question;
+            sendMessage();
+        }
+        
+        // Gérer la touche Entrée
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+        
+        // Afficher les statistiques
+        async function showStats() {
+            try {
+                const response = await fetch(`${API_URL}/stats`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    let statsText = `Statistiques de conversation:\n\n`;
+                    statsText += `Messages totaux: ${data.total_messages}\n\n`;
+                    statsText += `Distribution des méthodes:\n`;
+                    for (const [method, count] of Object.entries(data.methods_distribution)) {
+                        statsText += `- ${method}: ${count}\n`;
+                    }
+                    alert(statsText);
+                }
+            } catch (error) {
+                showError('Impossible de charger les statistiques');
+            }
+        }
+        
+        // Réinitialiser la conversation
+        async function resetChat() {
+            if (!confirm('Voulez-vous vraiment réinitialiser la conversation?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/reset`, {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('chatMessages').innerHTML = `
+                        <div class="message bot">
+                            <div class="message-bubble">
+                                Bonjour! Je suis votre guide touristique virtuel pour Tunis. Comment puis-je vous aider à découvrir notre belle ville? 🌟
+                                <div class="message-badge">RULE-BASED</div>
+                            </div>
+                        </div>
+                    `;
+                    messageCount = 1;
+                    updateMessageCount();
+                }
+            } catch (error) {
+                showError('Erreur lors de la réinitialisation');
+            }
+        }
+        
+        // Vérifier la connexion au démarrage
+        window.onload = async function() {
+            try {
+                const response = await fetch(`${API_URL}/stats`);
+                if (response.ok) {
+                    updateConnectionStatus(true);
+                } else {
+                    updateConnectionStatus(false);
+                }
+            } catch (error) {
+                updateConnectionStatus(false);
+                showError('Serveur non disponible. Démarrez le serveur Flask avec: python app.py');
+            }
+        };
+    </script>
+</body>
+</html> 
