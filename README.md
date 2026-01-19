@@ -46,11 +46,8 @@ chatbot-tunis/
 │   └── index.html                # Interface web connectée
 ├── tunis_chatbot_web.html        # Interface web standalone
 ├── requirements.txt              # Dépendances Python
-├── README.md                     # Documentation
-└── presentation/
-    ├── slides.pdf                # Présentation du projet
-    ├── article.pdf               # Article scientifique analysé
-    └── rapport.pdf               # Rapport optionnel
+└── README.md                     # Documentation
+
 ```
 
 ---

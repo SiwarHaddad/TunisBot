@@ -16,7 +16,7 @@ from nltk.corpus import stopwords
 def download_nltk_resources():
     resources = {
         'tokenizers/punkt': 'punkt',
-        'tokenizers/punkt_tab': 'punkt_tab', # Ressource manquante provoquant l'erreur
+        'tokenizers/punkt_tab': 'punkt_tab', 
         'corpora/stopwords': 'stopwords'
     }
     
